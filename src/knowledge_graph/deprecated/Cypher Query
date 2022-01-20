@@ -1,0 +1,91 @@
+Cypher Query
+
+merge (parent_node :Parent {
+    id: "aadf456ejfjjj66",
+    type: "LINK",
+    updated_at: datetime("2022-01-07T14:40:45.000Z"),
+    idd: "1929",
+    uri: "https://www.youtube.com/watch?v=LSCzMOcqgq8&t=1081s"
+})
+
+merge (metadata :Meta {
+    title: "Training Series: Create a Knowledge Graph: A Simple ML Approach",
+    img: "https://www.youtube.com/watch?v=LSCzMOcqgq8&t=1081s",
+    coords: "(0,0)"
+})
+
+merge (parent_node)-[r :HAS_META]->(metadata)
+
+merge (child1 :Child {
+    id: "kjsfhsjfkhfkfjad23u32oiuwdam",
+    type: "LINK",
+    parent_id: "aadf456ejfjjj66",
+    updated_at: datetime("2022-01-07T14:40:45.000Z"),
+    idd: 1936,
+    uri: "https://github.com/cj2001/nodes2021_kg_workshop This is the same with the typed message continuing over"
+})
+
+merge (parent_node)-[:HAS_CHILD]->(child1)
+
+merge (child2 :Child {
+    id: "lkajflkjfo23u4out3kjhfw983",
+    type: "LINK",
+    parent_id: "aadf456ejfjjj66",
+    updated_at: datetime("2022-01-07T14:40:22.000Z"),
+    idd: 1935,
+    uri: "https://github.com/cj2001/nodes2021_kg_workshop"
+})
+
+merge (metadata_child2 :Meta {
+    title: "GitHub - cj2001/nodes2021_kg_workshop", 
+    img: "https://opengraph.githubassets.com/679670572a7f9f8a28101c450eaf09a7d445061a71f0722431afcc9fe289e3bf/cj2001/nodes2021_kg_workshop",
+    coords: "(0,0)"
+})
+
+merge (child2)-[:HAS_META]->(metadata_child2)
+
+merge (parent_node)-[:HAS_CHILD]->(child2)
+
+merge (child3 :Child {
+    id: "ljshkhj84598fhfw983",
+    type: "TEXT",
+    parent_id: "aadf456ejfjjj66",
+    updated_at: datetime("2022-01-07T14:39:24.000Z"),
+    idd: 1934,
+    uri: "These are the slides associated with the presentation"
+})
+
+merge (parent_node)-[:HAS_CHILD]->(child3)
+
+
+merge (child4 :Child {
+    id: "lkajflkjsfhk88kjfo23u4out3kjhfw983",
+    type: "LINK",
+    parent_id: "aadf456ejfjjj66",
+    updated_at: datetime("2022-01-07T14:39:00.000Z"),
+    idd: 1933,
+    uri: "https://www.slideshare.net/neo4j/training-week-create-a-knowledge-graph-a-simple-ml-approach"
+})
+
+merge (metadata_child4 :Meta {
+    title: "Neo4j",
+    img: "https://cdn.slidesharecdn.com/ss_thumbnails/nodes2021kgworkshopsept-210917151159-thumbnail-4.jpg?cb=1631891859",
+    coords: "(0,0)"
+})
+
+merge (child4)-[:HAS_META]->(metadata_child4)
+
+merge (parent_node)-[:HAS_CHILD]->(child4)
+
+merge (child5 :Child {
+    id: "lkajflkwengfsnjfo23u4out3kjhfw983",
+    type: "TEXT",
+    parent_id: "aadf456ejfjjj66",
+    updated_at: datetime("2022-01-07T14:38:10.000Z"),
+    idd: 1932,
+    uri: "this is from a neo4j training video I saw and is a good source for learning about how to work with apoc procedures, specifically ones on how to deal with json data. "
+})
+
+merge (parent_node)-[:HAS_CHILD]->(child5)
+
+
