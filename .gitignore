@@ -3,3 +3,9 @@
 
 # ignore working files, files that start with a ~
 *~
+
+# ignore all json files
+*.json
+
+# ignore all csv files 
+*.csv
