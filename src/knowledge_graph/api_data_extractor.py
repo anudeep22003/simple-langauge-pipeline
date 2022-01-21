@@ -1,26 +1,28 @@
 import requests, json
 from graph_constructor import Constructor
+from env_variables import EnvVariables
 
-class EnvVariables:
 
-    """
-    Initializing env variables
-    """
-
-    t = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJpYXQiOjE2MzcxNDI2NjZ9.AkLL2rMRyvSkRoWEg2qbMMvv28-Y94-Hth4Qyh5Nl4c"
-
-    base_url = "https://api.prod.sb.codebuckets.in/v3/"
-    auth = 'auth/oauth'
-    me = ''
-
-    # payload to get the messages as a response
-    payload = {
-        "last_id": 0,
-        "selectedIndex": 0,
-        "token": t
-    }
 
 class ApiDataExtractor:
+    
+    """
+    Get the data out from Sidebrain's backed via an API and use it to construct the graph.
+    
+    Functions:
+    - Init
+        environment variables, object of constructor class and calls the orchestrator function
+    - requester
+        calls the api to get the data out, 
+        and converts the str to json object using the requests objects inbuilt json method
+    - orchestrator 
+        (1) handles the API pagination and has a stop flag which stops after page 1 run. 
+        (2) takes the requestors json data output and goes thread by thread to construct graph
+        (3) dumps the json to a file (may help to have all data in a single json)
+            write to the file by loading the file's current json into a python object and then 
+            extending it with the current API response, then truncating the file and rewriting it. 
+    """
+    
     
     def __init__(self) -> None:
         self.url = EnvVariables.base_url
