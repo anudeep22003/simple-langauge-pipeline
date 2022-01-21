@@ -9,3 +9,6 @@
 
 # ignore all csv files 
 *.csv
+
+# ignore all text files 
+*.txt 
