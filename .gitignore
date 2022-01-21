@@ -1,0 +1,5 @@
+# ignore file with name env_variables
+/env_variables
+
+# ignore working files, files that start with a ~
+*~
