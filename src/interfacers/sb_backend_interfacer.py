@@ -1,5 +1,5 @@
 import requests, json
-from graph_constructor import Constructor
+from neo4j_interfacer import Constructor
 from env_variables import EnvVariables
 
 
@@ -66,5 +66,5 @@ class ApiDataExtractor:
 
 
 
-a = ApiDataExtractor()
+
 

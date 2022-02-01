@@ -1,5 +1,5 @@
 # ignore file with name env_variables
-/env_variables
+/env_variables.py 
 
 # ignore working files, files that start with a ~
 *~
@@ -15,3 +15,12 @@
 
 # ignore all files in __pycache__ directory
 __pycache__/
+
+# ignore all pyc files
+*.pyc
+
+#ignore writeupfiles
+glial-code/writeups/*
+
+# ignore all data files 
+src/data/*
