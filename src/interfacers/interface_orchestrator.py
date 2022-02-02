@@ -1,6 +1,6 @@
 from cProfile import label
 from neo4j_interfacer import GraphExtractor
-from sqlite_interfacer import SqlHandler
+from sqlite_interfacer import SqlInitializer, SqlInterfacer
 from sb_backend_interfacer import ApiDataExtractor
 
 
@@ -24,7 +24,7 @@ class GraphToSqlLoader:
     
     def __init__(self, labels: list) -> None:
         self.graph_interface = GraphExtractor()
-        self.sqlite_interface = SqlHandler()
+        self.sqlite_interface = SqlInitializer()
         self.labels = labels
         pass
     
@@ -45,7 +45,7 @@ class GraphToSqlLoader:
             print("Unexpected label type")
 
         query = self.sqlite_interface.insert_query_generator(label)
-        self.sqlite_interface.insert_query_runner(query, data)
+        SqlInterfacer.insert_query_runner(query, data)
         
         pass
     

@@ -20,7 +20,7 @@ __pycache__/
 *.pyc
 
 #ignore writeupfiles
-glial-code/writeups/*
+misc-code/writeups/*
 
 # ignore all data files 
 src/data/*
