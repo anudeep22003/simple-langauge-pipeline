@@ -48,7 +48,7 @@ class ApiDataExtractor:
             # try: run graph constructor 
             # except: print page, id and parent_id of failed message 
 
-            with open(file='src/knowledge_graph/anudeep_braindump.json',mode='a') as f:
+            with open(file='/Users/anudeepyegireddi/Development/Sidebrain/nlp-apps/simple-language-pipeline/misc-code/data_output/anudeep_braindump.json',mode='a') as f:
                 try:
                     py_obj = json.load(fp=f)
                 except:

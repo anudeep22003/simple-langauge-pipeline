@@ -1,20 +1,30 @@
 # Approach to buuilding the keyword neuron
 
 ## Outline
-- Extract language data from sql --> use sql class to write and run the extract clause 
+- [x] Extract language data from sql --> use sql class to write and run the extract clause 
 - For each message / row 
-  - run through a keyword_extractor 
+  - run through a **keyword_extractor**
   - store the keywords in a dictionary
-    - (use a class to store the dict and keep track of the kv pairs)
+    - use a try except block, `except KeyError: list.append`
+    - (use a class to store the dict and keep track of the kv `keyword, value: tuple(index, position, POS)` pairs)
 - write the key value pairs into a file
 
 ### SQL Interface:
 Ensure the system works for a single sql row (limit to 1)
-- `Select uri from message_index LIMIT 10`
-- go through each row and print the uri
+- [x] `Select uri from message_index LIMIT 10`
+- [x] go through each row and print the uri
+
+
+### Keyword Extractor
+- import spacy 
+- load a language model by using `spacy.load("en_core_web_sm")` which returns a `language` object
+- the `language` object takes either a `doc` or a `str` object and tokenizes it (you can include and not skip different things)
 
 
 
+Spacy Architecture
+
+![image](https://spacy.io/architecture-415624fc7d149ec03f2736c4aa8b8f3c.svg)
 
 
 

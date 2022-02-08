@@ -1,6 +1,7 @@
-from datetime import datetime
+from datetime import date, datetime
 import json
 from pickle import FALSE
+from typing import Dict
 from py2neo import Graph
 from env_variables import EnvVariables
 from pprint import pprint as pp
@@ -125,12 +126,53 @@ class Constructor:
             print(f"error #{self.errors} skipped")
             query = '---'*5 + f' Error Point {self.errors} ' + '---'*5 + ' \n' + query 
 
-        with open('src/knowledge_graph/sample_cypher_query.txt', mode='a') as f:
+        with open('/Users/anudeepyegireddi/Development/Sidebrain/nlp-apps/simple-language-pipeline/misc-code/data_output/sample_cypher_query.txt', mode='a') as f:
             f.write(query)
             f.write('\n\n')
 
     
 class GraphExtractor:
+    
+    """
+    Global Variable --> GRAPH object that initializes a connection to the graph database
+    
+    Purpose:
+    A class to help with ETL of data from graph db to other databases. 
+    To `extract` data from the graph db and `transform` it into a sequence of list objects that can be used to `load` into other databases (tested for sqllite)
+    
+    ******* Functions: ********
+    
+    - extract_orchestrator_debug (default switched off, switched on to debug)
+    Orchestrates the entire extraction calling all the necessary class functions to sybchronize a total extract of the data in the Neo4j db
+    (1) takes as an input the least common denominator of unique labels in the graph db
+    (2) writes the list output of each dict item in the cursor to a file for inspection of errors 
+    
+    - extract_orchestrator_production
+    Takes a label as an input -> generates respective query to extract data -> runs the query \
+    -> returns a dict version of the cursor returned by the transaction object (that the GRAPH class creates)
+    
+    - extract_query_generator
+    Generates a query to return all the nodes of that label type from the graph db based on the passed label     
+    
+    - extract_query_runner
+    Takes a well constructed query as an input and interaces with the GRAPH object to run the query and return the output. 
+    The output is returned in a dict form (for each row)
+    
+    - serialize_neo_datetime
+    Neo4j uses its own proprietary datetime format for storing dates, this method deserializes that into a python datetime object 
+    
+    - extract_message_property_extractor
+    Convert the (message) node object that is in the dict returned by the cursor, and serializes the data into an ordered list that can be loaded into a sql db. 
+    
+    - extract_meta_property_extractor
+    Convert the (meta) node object that is in the dict returned by the cursor, and serializes the data into an ordered list that can be loaded into a sql db. 
+
+    - sample_query
+    Not part of the main class, created to test the methods of the class when debugging
+
+    Returns:
+        [type]: [description]
+    """
 
     GRAPH = Graph(EnvVariables.neo4j_creds['url'], auth = EnvVariables.neo4j_creds['auth'])
     
@@ -152,17 +194,17 @@ class GraphExtractor:
 
         pass
     
-    def extract_orchestrator_production(self, label):
+    def extract_orchestrator_production(self, label) -> dict:
         return self.extract_query_runner(self.extract_query_generator(label))
 
     
-    def extract_query_generator(self, label = "Message"):
+    def extract_query_generator(self, label = "Message") -> str:
         if label == "Message":
             return "Match (m:Message) return m, labels(m) as labels, id(m) as id"
         else:
             return "Match (m:Meta) return m, labels(m) as labels, id(m) as id"
 
-    def extract_query_runner(self, cypher_query:str):
+    def extract_query_runner(self, cypher_query:str) -> dict:
         
         # returns a cursor object which is a Records object
         cursor_obj = GraphExtractor.GRAPH.run(cypher_query)
@@ -170,10 +212,10 @@ class GraphExtractor:
         return cursor_obj.data()
     
     # d is the neodatetime object
-    def serialize_neo_datetime(self, d: DateTime):
+    def serialize_neo_datetime(self, d: DateTime) -> datetime:
         return datetime(d.year, d.month, d.day, d.hour, d.minute, int(d.second), tzinfo=d.tzinfo)
     
-    def extract_message_property_extractor(self, cursor_dict_obj):
+    def extract_message_property_extractor(self, cursor_dict_obj) -> list:
         
         # the node is a py2neo.Node.node object that needs to be converted into a dict to access
         node = dict(cursor_dict_obj['m'])
@@ -189,11 +231,12 @@ class GraphExtractor:
                 ]
         except:
             # load_into_sql_list = f"Error \n Node: {node}"
+            load_into_sql_list = ["","","","","",""]
             print(f"Error \n Node: {node}")
             
         return load_into_sql_list
         
-    def extract_meta_property_extractor(self, cursor_dict_obj):
+    def extract_meta_property_extractor(self, cursor_dict_obj) -> list:
         #img, title, 
         # the node is a py2neo.Node.node object that needs to be converted into a dict to access
         node = dict(cursor_dict_obj['m'])
@@ -209,6 +252,7 @@ class GraphExtractor:
                 ]
         except:
             # load_into_sql_list = f"Error \n Node: {node}"
+            load_into_sql_list = ["","","","","",""]
             print(f"Error \n Node: {node}")
             
         return load_into_sql_list

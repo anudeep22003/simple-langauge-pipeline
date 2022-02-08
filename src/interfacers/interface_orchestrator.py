@@ -45,7 +45,7 @@ class GraphToSqlLoader:
             print("Unexpected label type")
 
         query = self.sqlite_interface.insert_query_generator(label)
-        SqlInterfacer.insert_query_runner(query, data)
+        SqlInterfacer.INSERT_QUERY_RUNNER(query, data)
         
         pass
     

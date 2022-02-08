@@ -1,3 +1,7 @@
+from interfacers import sqlite_interfacer
+from sqlite_interfacer import SqlInterfacer
+
+
 import random
 import requests
 import spacy
