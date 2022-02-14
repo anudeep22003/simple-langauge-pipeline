@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import datetime, tzinfo, timezone
 import json
 from pickle import FALSE
 from typing import Dict
@@ -6,6 +6,10 @@ from py2neo import Graph
 from env_variables import EnvVariables
 from pprint import pprint as pp
 from neotime import DateTime
+
+import os, sys
+sys.path.append(os.path.join(os.getcwd(),'src','glial_code'))
+from decorators import Decorators
 
 class Constructor:
     
@@ -48,7 +52,7 @@ class Constructor:
     def __init__(self) -> None:        
         """Create the py2neo transaction object here
         """
-        #self.txn = Constructor.GRAPH.auto()
+        self.neo_interfacer = Neo4jInterfacer()
         self.errors = 0
         pass
     
@@ -70,7 +74,7 @@ class Constructor:
         }})
         """
 
-        self.cypher_runner(query=q)
+        self.neo_interfacer.cypher_write_query_runner(query=q)
 
         if msg['data']['link_title'] or msg['data']['link_img']:
             self.meta_node_creator(msg['data'], msg['id'])        
@@ -92,7 +96,7 @@ class Constructor:
         merge (msg)-[:HAS_META]->(m)
         """
 
-        self.cypher_runner(query=q)
+        self.neo_interfacer.cypher_write_query_runner(query=q)
 
 
 
@@ -112,13 +116,13 @@ class Constructor:
         where p.id = c.parent_id
         merge (p)-[:HAS_CHILD]->(c)
         """
-        self.cypher_runner(query=q)
+        self.neo_interfacer.cypher_write_query_runner(query=q)
 
         if msg['data']['link_title'] or msg['data']['link_img']:
             self.meta_node_creator(msg['data'], msg['id'])
 
     def cypher_runner(self, query):
-        txn = Constructor.GRAPH.auto()
+        txn = self.neo_interfacer.graph.auto()
         try:
             txn.run(query)
         except:
@@ -134,7 +138,6 @@ class Constructor:
 class GraphExtractor:
     
     """
-    Global Variable --> GRAPH object that initializes a connection to the graph database
     
     Purpose:
     A class to help with ETL of data from graph db to other databases. 
@@ -149,17 +152,10 @@ class GraphExtractor:
     
     - extract_orchestrator_production
     Takes a label as an input -> generates respective query to extract data -> runs the query \
-    -> returns a dict version of the cursor returned by the transaction object (that the GRAPH class creates)
+    -> returns data as a dict
     
     - extract_query_generator
     Generates a query to return all the nodes of that label type from the graph db based on the passed label     
-    
-    - extract_query_runner
-    Takes a well constructed query as an input and interaces with the GRAPH object to run the query and return the output. 
-    The output is returned in a dict form (for each row)
-    
-    - serialize_neo_datetime
-    Neo4j uses its own proprietary datetime format for storing dates, this method deserializes that into a python datetime object 
     
     - extract_message_property_extractor
     Convert the (message) node object that is in the dict returned by the cursor, and serializes the data into an ordered list that can be loaded into a sql db. 
@@ -170,19 +166,18 @@ class GraphExtractor:
     - sample_query
     Not part of the main class, created to test the methods of the class when debugging
 
-    Returns:
-        [type]: [description]
     """
 
     GRAPH = Graph(EnvVariables.neo4j_creds['url'], auth = EnvVariables.neo4j_creds['auth'])
     
     def __init__(self) -> None:
+        self.neo_interfacer = Neo4jInterfacer()
         pass
     
     def extract_orchestrator_debug(self, label_list:list=['Message','Meta']):
         for label in label_list:
             cypher = self.extract_query_generator(label)
-            cursor_dict = self.extract_query_runner(cypher_query=cypher)
+            cursor_dict = self.neo_interfacer.cypher_read_query_runner(cypher_query=cypher)
             if label == "Message":
                 with open("glial-code/data_output/cypher_to_sql_message.txt", mode = 'a') as f:
                     for dict_entry in cursor_dict:
@@ -195,7 +190,7 @@ class GraphExtractor:
         pass
     
     def extract_orchestrator_production(self, label) -> dict:
-        return self.extract_query_runner(self.extract_query_generator(label))
+        return self.neo_interfacer.cypher_read_query_runner(self.extract_query_generator(label))
 
     
     def extract_query_generator(self, label = "Message") -> str:
@@ -203,17 +198,7 @@ class GraphExtractor:
             return "Match (m:Message) return m, labels(m) as labels, id(m) as id"
         else:
             return "Match (m:Meta) return m, labels(m) as labels, id(m) as id"
-
-    def extract_query_runner(self, cypher_query:str) -> dict:
-        
-        # returns a cursor object which is a Records object
-        cursor_obj = GraphExtractor.GRAPH.run(cypher_query)
-        # adding .data() converts to a dict object 
-        return cursor_obj.data()
-    
-    # d is the neodatetime object
-    def serialize_neo_datetime(self, d: DateTime) -> datetime:
-        return datetime(d.year, d.month, d.day, d.hour, d.minute, int(d.second), tzinfo=d.tzinfo)
+ 
     
     def extract_message_property_extractor(self, cursor_dict_obj) -> list:
         
@@ -224,9 +209,9 @@ class GraphExtractor:
             load_into_sql_list = [
                 cursor_dict_obj['id'], 
                 str(cursor_dict_obj['labels']),
-                datetime.now(),
-                datetime.now(),
-                self.serialize_neo_datetime(node['updated_at']),
+                datetime.now(tz=timezone.utc),
+                datetime.now(tz=timezone.utc),
+                self.neo_interfacer.serialize_neo_datetime(node['updated_at']),
                 node['uri']
                 ]
         except:
@@ -245,8 +230,8 @@ class GraphExtractor:
             load_into_sql_list = [
                 cursor_dict_obj['id'], 
                 str(cursor_dict_obj['labels']),
-                datetime.now(),
-                datetime.now(),
+                datetime.now(tz=timezone.utc),
+                datetime.now(tz=timezone.utc),
                 node['title'],
                 node['img']
                 ]
@@ -256,10 +241,7 @@ class GraphExtractor:
             print(f"Error \n Node: {node}")
             
         return load_into_sql_list
-        
 
-    def cypher_logger():
-        pass
 
     def sample_query(self):
         txn = Constructor.GRAPH.auto()
@@ -287,8 +269,74 @@ class GraphExtractor:
             else: continue
                 
             
+@Decorators.singleton
+class Neo4jInterfacer:
     
+    """
+    
+    Purpose:
+    A singleton class to help to interface with Neo4j
+    
+    Attributes:
+    graph object --> initializes a connection to the graph database
+
+    ******* Functions: ********
+    
+    - cypher_read_query_runner
+        Takes a well constructed query as an input and interaces with the GRAPH object to run the query and return the output. 
+        The output is returned in a dict form (for each row)
+        
+    - cypher_write_query_runner
+        Takes a fully constructer write query (data included) and runs it. No return type.
+    
+    - serialize_neo_datetime
+        Neo4j uses its own proprietary datetime format for storing dates
+        this method deserializes that into a python datetime object 
+        
+    - serialize_py_datetime
+        This method serializes a python datetime object into a Neo4j DateTime object
+    
+    
+    """
+    
+    
+    def __init__(self) -> None:
+        self.graph = Graph(EnvVariables.neo4j_creds['url'], auth = EnvVariables.neo4j_creds['auth'])
+        self.errors = 0
+        pass
+    
+    def cypher_read_query_runner(self, cypher_query:str) -> dict:
+        
+        # returns a cursor object which is a Records object
+        cursor_obj = self.graph.run(cypher_query)
+        # adding .data() converts to a dict object 
+        return cursor_obj.data()
+    
+    
+    def cypher_write_query_runner(self, query):
+        txn = self.graph.auto()
+        try:
+            txn.run(query)
+        except Exception as e:
+            self.errors+=1
+            print(f"error #{self.errors} skipped, exception: {type(e)}, args: {e.args}")
+ 
+    
+    def serialize_neo_datetime(self, d: DateTime) -> datetime:
+        return datetime(d.year, d.month, d.day, d.hour, d.minute, int(d.second), tzinfo=d.tzinfo)
+    
+    def serialize_py_datetime(self,d:datetime):
+        return DateTime(d.year, d.month, d.day, d.hour, d.minute, d.second, tzinfo=d.tzname())
+
+    
+    pass
+
+
+
+
+
+
 if __name__ == "__main__":
-    g = GraphExtractor()
-    g.extract_orchestrator_debug()
+    #g = GraphExtractor()
+    # g.extract_orchestrator_debug()
     pass

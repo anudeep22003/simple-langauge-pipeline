@@ -37,14 +37,35 @@ class Decorators:
                 catcher(*args, **kwargs)
             except Exception as e:
                 print(f"Exception caught: {type(e)!r}\t args: {e.args}")
-
-
-def catch_exception(func):
-    """ Automatically insert a try block and catch and explain exception is caught."""
-    @functools.wraps(func)
-    def catcher(*args, **kwargs):
-        try: 
-            return func(*args, **kwargs)
-        except Exception as e:
-            return f"Exception caught: {type(e)!r}\t args: {e.args}"
-    return catcher
+    
+    def singleton(cls, *args, **kwargs):
+        """ 
+        To ensure that only a single instance of a class is created
+        Will be particularly useful for socket connection handler classes such as:
+        - Sql interfacer
+        - neo4j interfacer 
+        - Sidebrain backend interfacer
+        """
+        instances = {}
+        print(f'Dict {{instances}} value:{str(instances.items())}')
+        
+        @functools.wraps(cls)
+        def _singleton(*args, **kwargs):
+            if cls not in instances:
+                instances[cls]=cls(*args, **kwargs)
+                print(f'Dict {{instances}} value:{str(instances.items())} after a pass')
+            return instances[cls]
+        return _singleton
+    
+    def logger(func):
+        """ Log the function to a text file """
+        
+        def _logger(*args, **kwargs):
+            with open('/Users/anudeepyegireddi/Development/Sidebrain/nlp-apps/simple-language-pipeline/src/data/log_file.txt', mode = 'a') as f:
+                f.write(f"Function:  {func.__name__}\n")
+                value = func(*args, **kwargs)
+                f.write(str(value))
+            
+            return value
+            
+        return _logger
