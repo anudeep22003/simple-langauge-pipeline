@@ -320,7 +320,16 @@ class Neo4jInterfacer:
         except Exception as e:
             self.errors+=1
             print(f"error #{self.errors} skipped, exception: {type(e)}, args: {e.args}")
- 
+    
+    def cypher_write_read_query_runner(self, cypher_query:str) -> dict:
+        
+        txn = self.graph.auto()
+        try:
+            # returns a cursor object which is a Records object
+            return txn.run(cypher_query).data()
+        # adding .data() converts to a dict object 
+        except:
+            return [{'id': 2126}]
     
     def serialize_neo_datetime(self, d: DateTime) -> datetime:
         return datetime(d.year, d.month, d.day, d.hour, d.minute, int(d.second), tzinfo=d.tzinfo)

@@ -37,7 +37,15 @@
 # print(a)
 
 
-somedict = {'name': 'Anudeep', 'age': 32, 'designation':'builder' }
-print(somedict)
-print(somedict.values())
-#print(list(somedict.keys()))
+# somedict = {'name': 'Anudeep', 'age': 32, 'designation':'builder' }
+# print(somedict)
+# print(somedict.values())
+# #print(list(somedict.keys()))
+
+
+import requests
+from pprint import pprint as pp
+
+response = requests.head("https://www.slush.org/events/resource-bank/builders-studio/")
+
+pp(dict(response.headers))
