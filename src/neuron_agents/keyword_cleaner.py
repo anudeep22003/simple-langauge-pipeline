@@ -1,7 +1,7 @@
 import sys, os
 sys.path.append(os.path.join(os.getcwd(),'src','interfacers'))
-
 from neo4j_interfacer import Neo4jInterfacer
+
 from pprint import pprint as pp
 
 
@@ -84,7 +84,7 @@ class Placeholder:
         user_input = input("---> ")
         return self.action_selector(user_input, entry['word'])
         
-    
+    # ! add removed keywords into a removed dict 
     def action_selector(self, input:str = 'start', word: str = None):
         if input == "":
             return 1
