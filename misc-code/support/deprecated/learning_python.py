@@ -43,9 +43,19 @@
 # #print(list(somedict.keys()))
 
 
-import requests
-from pprint import pprint as pp
+# import requests
+# from pprint import pprint as pp
 
-response = requests.head("https://www.slush.org/events/resource-bank/builders-studio/")
+# response = requests.head("https://www.slush.org/events/resource-bank/builders-studio/")
 
-pp(dict(response.headers))
+# pp(dict(response.headers))
+
+def size_chooser(user_input_value):
+    try:
+        v = 5/user_input_value
+        print("accepted")
+    except ZeroDivisionError:
+        print("this exception block is working, try again")
+
+
+size_chooser(0)

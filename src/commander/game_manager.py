@@ -2,7 +2,8 @@
 ##### Manual imports ######
 
 from commands import TagCommand
-from command_handler import UserCommandHandler
+from command_handler import TopLevelUserCommandHandler
+from abstract_factory import CommandHandler
 from user import User
 
 
@@ -53,7 +54,7 @@ class SingleUserGameInitializer:
     
     user_directory = list()
     
-    def __init__(self, game_manager: UserCommandHandler) -> None:
+    def __init__(self, game_manager: CommandHandler) -> None:
         self.manager = game_manager()
         self.game_orchestrator()
         
@@ -69,4 +70,4 @@ class SingleUserGameInitializer:
 
 
 if __name__ == "__main__":
-    game = SingleUserGameInitializer(UserCommandHandler)
+    game = SingleUserGameInitializer(TopLevelUserCommandHandler)

@@ -1,4 +1,4 @@
-from command_handler import UserCommandHandler
+from abstract_factory import CommandHandler
 import random, string
 
 class User:
@@ -15,7 +15,7 @@ class User:
     def __init__(self, name, 
                  id: str = None, 
                  loc: str = 'Bangalore', 
-                 command_handler = UserCommandHandler) -> None:
+                 command_handler = CommandHandler) -> None:
         
         self.name = name
         self.id = self.generate_id(id)
