@@ -10,4 +10,5 @@ I use the following pieces to fulfill it:
 Few links that may help:
 [A youtube demo and explanation of the backend of this codebase](https://youtu.be/JjIIGAORziM))
 
-![A screenshot of my self-organizing Knowledge Graph](media/KG.png "A screenshot of my self-organizing Knowledge Graph")
+![basic structure of a thought](media/basic_structure.png "What a basic structure of a thought looks like with the interconnections")
+![A screenshot of a part of my self-organizing Knowledge Graph](media/emergent_structure.png "A screenshot of my self-organizing Knowledge Graph")
