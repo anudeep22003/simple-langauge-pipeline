@@ -15,7 +15,7 @@ sys.path.append(os.path.join(os.getcwd(),'src','glial_code'))
 from decorators import Decorators
 
 nlp = spacy.load('en_core_web_lg')
-nlp.add_pipe("textrank")
+#nlp.add_pipe("textrank")
 
 
 def sample_func():

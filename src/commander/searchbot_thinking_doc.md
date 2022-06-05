@@ -31,3 +31,8 @@ New things:
   - allow users to enter a search query to define direction 
 - when user enters a certain numbers add that to the selection set
 - show one-step-away keywords from selected keyword
+
+### Stage: User has selected a particular keyword of a particular type (or a few)
+How to proceed from here
+
+**Intent**: To show the user related choices that they can choose from

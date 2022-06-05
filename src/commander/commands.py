@@ -7,7 +7,7 @@ from collections import defaultdict
 from abstract_factory import Command, CommandHandler
 sys.path.append(os.path.join(os.getcwd(),'src','interfacers'))
 from neo4j_interfacer import Neo4jInterfacer
-
+from enum_factory import PrintColors
 
 class TagCommand(Command):
     
@@ -75,7 +75,7 @@ class KeywordCleanerCommand(Command):
     
     
     def start_subgame(self, user_adventure):
-        cprint("--> How many do you want to get through today\t",color='red')
+        cprint("--> How many do you want to get through today\t",color=PrintColors.system.value)
         print("exit by pressing q: to (q)uit")
         
         user_input = input("Enter your choice\t--> ")
@@ -86,7 +86,7 @@ class KeywordCleanerCommand(Command):
             input_size = int(user_input)    
             continue_index = len(self.parse_complete_dict[user_adventure]) - len(self.delete_complete_dict[user_adventure])
             last_index = int(input_size) + continue_index
-            cprint(f"Ok, we will start from #{continue_index} and go till #{last_index}", color='red')
+            cprint(f"Ok, we will start from #{continue_index} and go till #{last_index}", color=PrintColors.system.value)
             cprint(self.option_string(),color='yellow', on_color='on_grey')
         
             # each item of the list is a dict with keys: `word` and `count`
@@ -117,13 +117,13 @@ class KeywordCleanerCommand(Command):
             
     
     def cleanup_selection(self, adventure):
-        cprint(("selection list",self.selection_set), color='green')
+        cprint(("selection list",self.selection_set), color = PrintColors.feedback.value)
         self.selection_set.clear()
         self.parse_complete_dict[adventure].extend(self.current_parse_accepted_dict[adventure])
-        cprint((f"parse complete list for {adventure}",self.parse_complete_dict[adventure]), color='green')
-        cprint((f"parse accepted list for {adventure}",self.current_parse_accepted_dict[adventure]), color='green')
+        cprint((f"parse complete list for {adventure}",self.parse_complete_dict[adventure]), color = PrintColors.feedback.value)
+        cprint((f"parse accepted list for {adventure}",self.current_parse_accepted_dict[adventure]), color = PrintColors.feedback.value)
         self.current_parse_accepted_dict[adventure].clear()
-        cprint("Cleaned up the current selection for the next round....", color='green')
+        cprint("Cleaned up the current selection for the next round....", color = PrintColors.feedback.value)
         
     def add_to_selection(self, word):
         self.selection_set.append(word)

@@ -47,4 +47,3 @@ class CommandHandler(metaclass = ABCMeta):
     
     def choose_your_adventure(self):
         ...
-    
